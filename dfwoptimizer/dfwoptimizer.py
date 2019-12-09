@@ -89,7 +89,7 @@ REGEX_RULE_STRING = r"""(?: #Non Capturing Parenthesis
     \sprotocol
     \s(?:
       # Standard Non-Port protocols
-      (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip)
+      (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip|pim)
     )
     (?:\s+stateless)?
     (?:\s+strict)?
