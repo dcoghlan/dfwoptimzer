@@ -1,4 +1,12 @@
 import os
+import sys
+
+
+def validate_python():
+    version = sys.version_info
+    if version[0] < 3 or version[1] < 6:
+        print("DFW Optimizer expects python 3.6 or above")
+        sys.exit(1)
 
 
 def create_dir(path):
@@ -6,7 +14,9 @@ def create_dir(path):
         os.makedirs(path)
 
 
-def validate_file(file):
+def validate_file(file, debug=False):
+    if debug is True:
+        print("  --> validating path: %s" % (file))
     if not os.path.exists(file):
         print("path specified doesn't exist: %s" % (file))
         exit()
@@ -75,3 +85,7 @@ def check_list_space(data, entryWeightToAdd):
             serviceIndex = idx
 
     return serviceIndex
+
+
+def print_blank_line():
+    print('\n')
