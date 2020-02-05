@@ -25,8 +25,8 @@ class AddrsetParser:
     ) #Close Non Capturing Parenthesis
     """
     REGEX_ADDRSET_MATCH = re.compile(REGEX_ADDRSET_STRING, re.VERBOSE)
-    REGEX_IGNORE = re.compile(
-        "\ .#\ (generation|realization|ruleset|Filter\ rules)")
+    REGEX_IGNORE_STRING = r"""vsipioctl|generation number|realization time|Filter rules"""
+    REGEX_IGNORE = re.compile(REGEX_IGNORE_STRING)
 
     def __init__(self, file_name):
         self.addrsets = collections.OrderedDict()
