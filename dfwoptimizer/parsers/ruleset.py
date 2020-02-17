@@ -424,7 +424,7 @@ class RulesParser:
         self.genericParsedRuleset[ruleid]['protocol'] = data
 
     def process_tcp_service(self, ruleid, matchgroup):
-        if matchgroup.group('L3T1_ruleProtocol') == 'tcp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
+        if matchgroup.group('L3T1_ruleProtocol') == 'tcp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal') and not matchgroup.group('L3T1_ruleAttribute') and not matchgroup.group('L3T1_RuleSourcePort'):
             self.serviceParsedRuleset[ruleid]['total_tcp'] = self.serviceParsedRuleset[ruleid]['total_tcp'] + 1
 
             # set a variable for the number of entries. Set this to one by default, that way we can keep a track
@@ -454,9 +454,11 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_tcp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_tcp'][serviceIndex], item)
+        elif matchgroup.group('L3T1_ruleProtocol') == 'tcp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
+            self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
 
     def process_udp_service(self, ruleid, matchgroup):
-        if matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
+        if matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal') and not matchgroup.group('L3T1_ruleAttribute') and not matchgroup.group('L3T1_RuleSourcePort'):
             self.serviceParsedRuleset[ruleid]['total_udp'] = self.serviceParsedRuleset[ruleid]['total_udp'] + 1
 
             # set a variable for the number of entries. Set this to one by default, that way we can keep a track
@@ -465,6 +467,7 @@ class RulesParser:
             entryWeightToAdd = 1
 
             if matchgroup.group('L3T1_RuleDestinationPort') or matchgroup.group('L3T1_RuleDestinationPort1'):
+
                 # first determine if we are working with a port range or not
                 destinationPort = matchgroup.group(
                     'L3T1_RuleDestinationPort') or matchgroup.group('L3T1_RuleDestinationPort1')
@@ -484,6 +487,8 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_udp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_udp'][serviceIndex], item)
+        elif matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
+            self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
 
     def process_icmp(self, ruleid, matchgroup):
         if matchgroup.group('L3T2_ruleid'):
