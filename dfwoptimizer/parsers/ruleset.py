@@ -774,7 +774,7 @@ class AnalyzeAppliedTo:
 
     def check_zero_net(self, ipObject):
         """
-        Zero networks are treated as global rules. Depending on the version on 
+        Zero networks are treated as global rules. Depending on the version on
         NSX being used, in the earlier versions it was perfectly valid to have a
         zero network address on the data plane. In the later versions on NSX,
         this behaviour was removed but still need to test against it.
@@ -789,7 +789,7 @@ class AnalyzeAppliedTo:
 
     def exist_in(self, ruleid, address, field):
         """
-        Given a rule id, will check the supplied address matches the supplied 
+        Given a rule id, will check the supplied address matches the supplied
         field (src/dst)
         """
         status = False
@@ -813,7 +813,7 @@ class AnalyzeAppliedTo:
 
     def exist_in_addrset(self, address, addrset):
         """
-        Checks a given address exists within an address set (supplied by name). 
+        Checks a given address exists within an address set (supplied by name).
         This could be an exact IP match, or the address could exists within one
         of the networks
         """
@@ -831,7 +831,7 @@ class AnalyzeAppliedTo:
 
     def exist_multicast(self, ruleid):
         """
-        Check whether a multicast address exists in a rule. If it does, then we 
+        Check whether a multicast address exists in a rule. If it does, then we
         return True to signifiy that this rule should be treated as a global rule
         """
         multicastFound = False
