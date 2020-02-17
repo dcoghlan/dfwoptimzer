@@ -230,11 +230,12 @@ class RulesParser:
     REGEX_IGNORE_STRING = r"""vsipioctl|generation number|realization time|Filter rules"""
     REGEX_IGNORE = re.compile(REGEX_IGNORE_STRING)
 
-    def __init__(self, file_name):
+    def __init__(self, file_name, debug):
         self.genericParsedRuleset = collections.OrderedDict()
         self.serviceParsedRuleset = collections.OrderedDict()
         self.appliedto_dict = collections.OrderedDict()
         self.parseErrors = []
+        self.debug = debug
         self.file_name = file_name
         self.rules_file = open(self.file_name, 'r')
         self.load_ruleset(self.rules_file)
@@ -432,6 +433,11 @@ class RulesParser:
             # counts as 2, so its not as simple as just counting the number of entries in the list.
             entryWeightToAdd = 1
 
+            position = matchgroup.group('L3T1_rulePosition')
+            if self.debug:
+                print("RuleID: %s; Position: %s; Eligible for optimization (TCP Port)" %
+                      (ruleid, position))
+
             if matchgroup.group('L3T1_RuleDestinationPort') or matchgroup.group('L3T1_RuleDestinationPort1'):
                 # first determine if we are working with a port range or not
                 destinationPort = matchgroup.group(
@@ -450,12 +456,26 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_tcp'], item):
                             self.serviceParsedRuleset[ruleid]['optimized_service_tcp'].append(
                                 [item])
+                            print("RuleID: %s; Position: %s; Item: TCP %s: Starting new port listing." %
+                                  (ruleid, position, item))
+                        else:
+                            print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
+                                  (ruleid, position, item))
                     else:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_tcp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_tcp'][serviceIndex], item)
+                            print("RuleID: %s; Position: %s; Item: TCP %s: Adding to existing port listing." %
+                                  (ruleid, position, item))
+                        else:
+                            print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
+                                  (ruleid, position, item))
         elif matchgroup.group('L3T1_ruleProtocol') == 'tcp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
             self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
+
+            if self.debug:
+                print("RuleID: %s; Position: %s; Non-Eligible Rule" %
+                      (ruleid, matchgroup.group('L3T1_rulePosition')))
 
     def process_udp_service(self, ruleid, matchgroup):
         if matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal') and not matchgroup.group('L3T1_ruleAttribute') and not matchgroup.group('L3T1_RuleSourcePort'):
@@ -465,6 +485,11 @@ class RulesParser:
             # of what we are adding to the service. NSX-v services have a limit of 15 entries, but a range
             # counts as 2, so its not as simple as just counting the number of entries in the list.
             entryWeightToAdd = 1
+
+            position = matchgroup.group('L3T1_rulePosition')
+            if self.debug:
+                print("RuleID: %s; Position: %s; Eligible for optimization (UDP Port)" %
+                      (ruleid, position))
 
             if matchgroup.group('L3T1_RuleDestinationPort') or matchgroup.group('L3T1_RuleDestinationPort1'):
 
@@ -483,12 +508,25 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_udp'], item):
                             self.serviceParsedRuleset[ruleid]['optimized_service_udp'].append(
                                 [item])
+                            print("RuleID: %s; Position: %s; Item: UDP %s: Starting new port listing." %
+                                  (ruleid, position, item))
+                        else:
+                            print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
+                                  (ruleid, position, item))
                     else:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_udp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_udp'][serviceIndex], item)
+                            print("RuleID: %s; Position: %s; Item: UDP %s: Adding to existing port listing." %
+                                  (ruleid, position, item))
+                        else:
+                            print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
+                                  (ruleid, position, item))
         elif matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
             self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
+            if self.debug:
+                print("RuleID: %s; Position: %s; Non-Eligible Rule" %
+                      (ruleid, matchgroup.group('L3T1_rulePosition')))
 
     def process_icmp(self, ruleid, matchgroup):
         if matchgroup.group('L3T2_ruleid'):
@@ -537,10 +575,11 @@ class RulesParser:
 
             if line:
                 processingCounter += 1
-                print(' ' * 80, end='\r')
-                print('  --> Processed %s lines.' %
-                      processingCounter, end='\r')
-                sys.stdout.flush()
+                if not self.debug:
+                    print(' ' * 80, end='\r')
+                    print('  --> Processed %s lines.' %
+                          processingCounter, end='\r')
+                    sys.stdout.flush()
 
                 ignorematch = re.search(self.REGEX_IGNORE, line)
                 globalmatch = re.search(self.REGEX_RULE_MATCH, line)
@@ -601,10 +640,11 @@ class AnalyzeServices:
     total_rule_optimized_servicelists_tcp = 0
     total_rule_optimized_servicelists_udp = 0
 
-    def __init__(self, outputdir, prefix, dictObject):
+    def __init__(self, outputdir, prefix, dictObject, debug):
         self.OUTPUTDIR = outputdir
         self.PREFIX = prefix
         self.RULESET = dictObject
+        self.debug = debug
 
     def generate_csv(self):
         with open('%s/%sservice_data.csv' % (self.OUTPUTDIR, self.PREFIX), 'w', encoding='utf-8') as csv_file:

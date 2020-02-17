@@ -36,7 +36,7 @@ def process_applied_to(rulesObject, args):
 def process_services(rulesObject, args):
     rulesObject.dump_serviceParsedRuleset_file(args.outputdir, args.prefix)
     services = AnalyzeServices(
-        args.outputdir, args.prefix, rulesObject.get_serviceParsedRuleset())
+        args.outputdir, args.prefix, rulesObject.get_serviceParsedRuleset(), args.debug)
     services.generate_csv()
     services.generate_summary()
     services.display_summary()
@@ -52,7 +52,7 @@ def main(args):
         utils.validate_file(args.addrsets, args.debug)
 
     args.prefix = '%s-' % (args.prefix)
-    parsedRules = RulesParser(args.rules)
+    parsedRules = RulesParser(args.rules, args.debug)
 
     if args.parser_mode == 'dfw_services':
         process_services(parsedRules, args)
