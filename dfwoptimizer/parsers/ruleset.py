@@ -68,7 +68,7 @@ class RulesParser:
         \sprotocol
         \s(?:
         # Standard Non-Port protocols
-        (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip|pim|240|vrrp)
+        (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip|pim|240|vrrp|ipv6-opts|ipv6-nonxt)
         )
         (?:\s+stateless)?
         (?:\s+strict)?
@@ -97,7 +97,7 @@ class RulesParser:
         | (?P<L3T0_RuleDestinationNegated1>not)\s+ip\s+(?P<L3T0_ruleDestinationAddrset4>\S+)
         )
         # with attribute addrset attr_1092_1_APP_ID
-        (?:\s+with\s+attribute\s+addrset\s+(?P<L3T0_ruleAttribute>\S+))?
+        (?:\s+with\s+attribute(?:\s+addrset)?\s+(?P<L3T0_ruleAttribute>\S+))?
         \s+
         (?P<L3T0_ruleAction>\S+) # accept|drop|punt
         (?:\s+with\s+(?P<L3T0_ruleLogging>log))? # with log
