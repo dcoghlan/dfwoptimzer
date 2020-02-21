@@ -456,20 +456,24 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_tcp'], item):
                             self.serviceParsedRuleset[ruleid]['optimized_service_tcp'].append(
                                 [item])
-                            print("RuleID: %s; Position: %s; Item: TCP %s: Starting new port listing." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: TCP %s: Starting new port listing." %
+                                      (ruleid, position, item))
                         else:
-                            print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
+                                      (ruleid, position, item))
                     else:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_tcp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_tcp'][serviceIndex], item)
-                            print("RuleID: %s; Position: %s; Item: TCP %s: Adding to existing port listing." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: TCP %s: Adding to existing port listing." %
+                                      (ruleid, position, item))
                         else:
-                            print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: TCP %s: Duplicate port detected." %
+                                      (ruleid, position, item))
         elif matchgroup.group('L3T1_ruleProtocol') == 'tcp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
             self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
 
@@ -508,20 +512,25 @@ class RulesParser:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_udp'], item):
                             self.serviceParsedRuleset[ruleid]['optimized_service_udp'].append(
                                 [item])
-                            print("RuleID: %s; Position: %s; Item: UDP %s: Starting new port listing." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: UDP %s: Starting new port listing." %
+                                      (ruleid, position, item))
                         else:
-                            print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
+                                      (ruleid, position, item))
                     else:
                         if not utils.check_exists_nested(self.serviceParsedRuleset[ruleid]['optimized_service_udp'], item):
                             utils.append_unique(
                                 self.serviceParsedRuleset[ruleid]['optimized_service_udp'][serviceIndex], item)
-                            print("RuleID: %s; Position: %s; Item: UDP %s: Adding to existing port listing." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: UDP %s: Adding to existing port listing." %
+                                      (ruleid, position, item))
                         else:
-                            print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
-                                  (ruleid, position, item))
+                            if self.debug:
+                                print("RuleID: %s; Position: %s; Item: UDP %s: Duplicate port detected." %
+                                      (ruleid, position, item))
+
         elif matchgroup.group('L3T1_ruleProtocol') == 'udp' and not matchgroup.group('L3T1_ruleALG') and not matchgroup.group('L3T1_ruleInternal'):
             self.serviceParsedRuleset[ruleid]['total_non_port'] = self.serviceParsedRuleset[ruleid]['total_non_port'] + 1
             if self.debug:
