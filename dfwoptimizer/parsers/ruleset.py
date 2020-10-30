@@ -68,7 +68,7 @@ class RulesParser:
         \sprotocol
         \s(?:
         # Standard Non-Port protocols
-        (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip|pim|240|vrrp|ipv6-opts|ipv6-nonxt)
+        (?P<L3T0_ruleProtocol>any|igmp|gre|ipv6-crypt|sctp|ip|pim|240|vrrp|ipv6-auth|ipv6-opts|ipv6-nonxt)
         )
         (?:\s+stateless)?
         (?:\s+strict)?
